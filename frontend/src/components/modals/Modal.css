@@ -1,0 +1,43 @@
+#modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(49, 49, 49, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#modal-background .popup {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  height: 300px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+#modal-background .popup .close-button {
+  position: absolute;
+  right: -15px;
+  top: -15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  color: gray;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgb(147, 142, 142);
+  cursor: pointer;
+}
+
+#modal-background .popup .message {
+  margin-bottom: 70px;
+}

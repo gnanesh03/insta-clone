@@ -4,13 +4,12 @@ import "../css/Profile.css";
 import ProfilePic from "../components/ProfilePic";
 
 export default function Profie() {
-  var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
+  var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png";
   const [pic, setPic] = useState([]);
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState("")
-  const [changePic, setChangePic] = useState(false)
-
+  const [user, setUser] = useState("");
+  const [changePic, setChangePic] = useState(false);
 
   const toggleDetails = (posts) => {
     if (show) {
@@ -23,24 +22,28 @@ export default function Profie() {
 
   const changeprofile = () => {
     if (changePic) {
-      setChangePic(false)
+      setChangePic(false);
     } else {
-      setChangePic(true)
+      setChangePic(true);
     }
-  }
-
+  };
 
   useEffect(() => {
-    fetch(`/user/${JSON.parse(localStorage.getItem("user"))._id}`, {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("jwt"),
-      },
-    })
+    fetch(
+      process.env.REACT_APP_BACKEND_URL +
+        `/user/${JSON.parse(localStorage.getItem("user"))._id}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("jwt"),
+        },
+        credentials: "include",
+      }
+    )
       .then((res) => res.json())
       .then((result) => {
-        console.log(result)
+        console.log(result);
         setPic(result.post);
-        setUser(result.user)
+        setUser(result.user);
         console.log(pic);
       });
   }, []);
@@ -78,20 +81,20 @@ export default function Profie() {
       {/* Gallery */}
       <div className="gallery">
         {pic.map((pics) => {
-          return <img key={pics._id} src={pics.photo}
-            onClick={() => {
-              toggleDetails(pics)
-            }}
-            className="item"></img>;
+          return (
+            <img
+              key={pics._id}
+              src={pics.photo}
+              onClick={() => {
+                toggleDetails(pics);
+              }}
+              className="item"
+            ></img>
+          );
         })}
       </div>
-      {show &&
-        <PostDetail item={posts} toggleDetails={toggleDetails} />
-      }
-      {
-        changePic &&
-        <ProfilePic changeprofile={changeprofile} />
-      }
+      {show && <PostDetail item={posts} toggleDetails={toggleDetails} />}
+      {changePic && <ProfilePic changeprofile={changeprofile} />}
     </div>
   );
 }

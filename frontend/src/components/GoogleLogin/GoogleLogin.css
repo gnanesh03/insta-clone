@@ -1,0 +1,15 @@
+#google-login-button {
+  background-color: white;
+  width: 200px;
+  height: 35px;
+  border: 1px solid rgb(220, 211, 211);
+  border-radius: 3px;
+  padding: 0px;
+
+  img {
+    width: 270px;
+    height: 33px;
+    cursor: pointer;
+    margin-left: -30px;
+  }
+}

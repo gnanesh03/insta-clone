@@ -1,97 +1,70 @@
-import React, { useEffect, useState,useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import logo from "../img/logo.png";
 import "../css/SignUp.css";
 import { Link, useNavigate } from "react-router-dom";
-import { GoogleLogin } from '@react-oauth/google';
-import { toast } from 'react-toastify';
-import jwt_decode from "jwt-decode";
+import { toast } from "react-toastify";
 import { LoginContext } from "../context/LoginContext";
-
-
+import axios from "axios";
+import { MyGoogleLogin } from "./GoogleLogin/GoogleLogin";
 
 export default function SignUp() {
-  const { setUserLogin } = useContext(LoginContext)
-  const navigate = useNavigate()
+  const { setUserLogin } = useContext(LoginContext);
+  const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("")
-  const [userName, setUserName] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+
+  //DEBUG
+
+  //test code
+  sessionStorage.setItem("test", "Gwen");
 
   // Toast functions
-  const notifyA = (msg) => toast.error(msg)
-  const notifyB = (msg) => toast.success(msg)
+  const notifyA = (msg) => toast.error(msg);
+  const notifyB = (msg) => toast.success(msg);
 
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
+  const passRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
 
   const postData = () => {
     //checking email
     if (!emailRegex.test(email)) {
-      notifyA("Invalid email")
-      return
+      notifyA("Invalid email");
+      return;
     } else if (!passRegex.test(password)) {
-      notifyA("Password must contain at least 8 characters, including at least 1 number and 1 includes both lower and uppercase letters and special characters for example #,?,!")
-      return
+      notifyA(
+        "Password must contain at least 8 characters, including at least 1 number and 1 includes both lower and uppercase letters and special characters for example #,?,!"
+      );
+      return;
     }
 
+    const url = process.env.REACT_APP_BACKEND_URL;
     // Sending data to server
-    fetch("/signup", {
+    fetch(url + "/signup", {
       method: "post",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         name: name,
         userName: userName,
         email: email,
-        password: password
-
-      })
-    }).then(res => res.json())
-      .then(data => {
+        password: password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
         if (data.error) {
-          notifyA(data.error)
+          notifyA(data.error);
         } else {
-          notifyB(data.message)
-          navigate("/signin")
+          notifyB(data.message);
+          navigate("/signin");
         }
-        console.log(data)
-      })
-  }
-
-  const continueWithGoogle =(credentialResponse)=>{
-    console.log(credentialResponse);
-    const jwtDetail = jwt_decode(credentialResponse.credential)
-    console.log(jwtDetail)
-    fetch("/googleLogin",{
-      method: "post",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: jwtDetail.name,
-        userName: jwtDetail,
-        email:jwtDetail.email,
-        email_verified:jwtDetail.email_verified,
-        clientId:credentialResponse.clientId,
-        Photo:jwtDetail.picture
-
-      })
-    }).then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          notifyA(data.error)
-        } else {
-          notifyB("Signed In Successfully")
-          console.log(data)
-          localStorage.setItem("jwt", data.token)
-          localStorage.setItem("user", JSON.stringify(data.user))
-          setUserLogin(true)
-          navigate("/")
-        }
-        console.log(data)
-      })
-  }
+        console.log(data);
+      });
+  };
 
   return (
     <div className="signUp">
@@ -102,10 +75,28 @@ export default function SignUp() {
             Sign up to see photos and videos <br /> from your friends
           </p>
           <div>
-            <input type="email" name="email" id="email" value={email} placeholder="Email" onChange={(e) => { setEmail(e.target.value) }} />
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value={email}
+              placeholder="Email"
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
           </div>
           <div>
-            <input type="text" name="name" id="name" placeholder="Full Name" value={name} onChange={((e) => { setName(e.target.value) })} />
+            <input
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+            />
           </div>
           <div>
             <input
@@ -114,7 +105,9 @@ export default function SignUp() {
               id="username"
               placeholder="Username"
               value={userName}
-              onChange={(e) => { setUserName(e.target.value) }}
+              onChange={(e) => {
+                setUserName(e.target.value);
+              }}
             />
           </div>
           <div>
@@ -124,7 +117,9 @@ export default function SignUp() {
               id="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => { setPassword(e.target.value) }}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
             />
           </div>
           <p
@@ -134,16 +129,16 @@ export default function SignUp() {
             By signing up, you agree to out Terms, <br /> privacy policy and
             cookies policy.
           </p>
-          <input type="submit" id="submit-btn" value="Sign Up" onClick={() => { postData() }} />
-          <hr/>
-          <GoogleLogin
-            onSuccess={credentialResponse => {
-             continueWithGoogle(credentialResponse)
-            }}
-            onError={() => {
-              console.log('Login Failed');
+          <input
+            type="submit"
+            id="submit-btn"
+            value="Sign Up"
+            onClick={() => {
+              postData();
             }}
           />
+          <hr />
+          <MyGoogleLogin />
         </div>
         <div className="form2">
           Already have an account ?

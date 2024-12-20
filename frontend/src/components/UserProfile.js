@@ -12,12 +12,13 @@ export default function UserProfie() {
 
   // to follow user
   const followUser = (userId) => {
-    fetch("/follow", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/follow", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         followId: userId,
       }),
@@ -31,12 +32,13 @@ export default function UserProfie() {
 
   // to unfollow user
   const unfollowUser = (userId) => {
-    fetch("/unfollow", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/unfollow", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         followId: userId,
       }),
@@ -51,10 +53,11 @@ export default function UserProfie() {
   };
 
   useEffect(() => {
-    fetch(`/user/${userid}`, {
+    fetch(process.env.REACT_APP_BACKEND_URL + `/user/${userid}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((result) => {

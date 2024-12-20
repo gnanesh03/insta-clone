@@ -22,10 +22,11 @@ export default function MyFolliwngPost() {
     }
 
     // Fetching all posts
-    fetch("/myfollwingpost", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/myfollwingpost", {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((result) => {
@@ -46,12 +47,13 @@ export default function MyFolliwngPost() {
   };
 
   const likePost = (id) => {
-    fetch("/like", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/like", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         postId: id,
       }),
@@ -70,12 +72,13 @@ export default function MyFolliwngPost() {
       });
   };
   const unlikePost = (id) => {
-    fetch("/unlike", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/unlike", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         postId: id,
       }),
@@ -96,12 +99,13 @@ export default function MyFolliwngPost() {
 
   // function to make comment
   const makeComment = (text, id) => {
-    fetch("/comment", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/comment", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         text: text,
         postId: id,

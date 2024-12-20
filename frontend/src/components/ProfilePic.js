@@ -14,6 +14,7 @@ export default function ProfilePic({ changeprofile }) {
     fetch("https://api.cloudinary.com/v1_1/cantacloud2/image/upload", {
       method: "post",
       body: data,
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => setUrl(data.url))
@@ -23,12 +24,13 @@ export default function ProfilePic({ changeprofile }) {
 
   const postPic = () => {
     // saving post to mongodb
-    fetch("/uploadProfilePic", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/uploadProfilePic", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         pic: url,
       }),

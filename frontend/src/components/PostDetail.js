@@ -12,11 +12,12 @@ export default function PostDetail({ item, toggleDetails }) {
 
   const removePost = (postId) => {
     if (window.confirm("Do you really want to delete this post ?")) {
-      fetch(`/deletePost/${postId}`, {
+      fetch(process.env.REACT_APP_BACKEND_URL + `/deletePost/${postId}`, {
         method: "delete",
         headers: {
           Authorization: "Bearer " + localStorage.getItem("jwt"),
         },
+        credentials: "include",
       })
         .then((res) => res.json())
         .then((result) => {
@@ -86,17 +87,17 @@ export default function PostDetail({ item, toggleDetails }) {
             <input
               type="text"
               placeholder="Add a comment"
-            //   value={comment}
-            //   onChange={(e) => {
-            //     setComment(e.target.value);
-            //   }}
+              //   value={comment}
+              //   onChange={(e) => {
+              //     setComment(e.target.value);
+              //   }}
             />
             <button
               className="comment"
-            //   onClick={() => {
-            //     makeComment(comment, item._id);
-            //     toggleComment();
-            //   }}
+              //   onClick={() => {
+              //     makeComment(comment, item._id);
+              //     toggleComment();
+              //   }}
             >
               Post
             </button>

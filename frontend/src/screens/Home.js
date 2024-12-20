@@ -3,16 +3,17 @@ import "../css/Home.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { LoginContext } from "../context/LoginContext";
 
 export default function Home() {
-  var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
+  var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png";
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [comment, setComment] = useState("");
   const [show, setShow] = useState(false);
   const [item, setItem] = useState([]);
-  let limit = 10
-  let skip = 0
+  let limit = 10;
+  let skip = 0;
 
   // Toast functions
   const notifyA = (msg) => toast.error(msg);
@@ -20,39 +21,45 @@ export default function Home() {
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
-    if (!token) {
-      navigate("./signup");
-    }
-fetchPosts()
+    checkLoginStatus(navigate);
 
-window.addEventListener("scroll",handleScroll)
-return ()=>{
-  window.removeEventListener("scroll",handleScroll)
-}
-    
+    fetchPosts();
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
-  const fetchPosts = ()=>{
+  const fetchPosts = () => {
     // Fetching all posts
-    fetch(`/allposts?limit=${limit}&skip=${skip}`, {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("jwt"),
-      },
-    })
+    fetch(
+      process.env.REACT_APP_BACKEND_URL +
+        `/allposts?limit=${limit}&skip=${skip}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("jwt"),
+        },
+        credentials: "include",
+      }
+    )
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
-        setData((data)=>[...data, ...result]);
+        //console.log(result);
+        setData((data) => [...data, ...result]);
       })
       .catch((err) => console.log(err));
-  }
+  };
 
-  const handleScroll = ()=>{
-    if(document.documentElement.clientHeight + window.pageYOffset >= document.documentElement.scrollHeight){
-      skip = skip + 10
-      fetchPosts()
+  const handleScroll = () => {
+    if (
+      document.documentElement.clientHeight + window.pageYOffset >=
+      document.documentElement.scrollHeight
+    ) {
+      skip = skip + 10;
+      fetchPosts();
     }
-  }
+  };
 
   // to show and hide comments
   const toggleComment = (posts) => {
@@ -65,12 +72,13 @@ return ()=>{
   };
 
   const likePost = (id) => {
-    fetch("/like", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/like", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         postId: id,
       }),
@@ -89,12 +97,13 @@ return ()=>{
       });
   };
   const unlikePost = (id) => {
-    fetch("/unlike", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/unlike", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         postId: id,
       }),
@@ -115,12 +124,13 @@ return ()=>{
 
   // function to make comment
   const makeComment = (text, id) => {
-    fetch("/comment", {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/comment", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
+      credentials: "include",
       body: JSON.stringify({
         text: text,
         postId: id,
@@ -147,7 +157,7 @@ return ()=>{
       {/* card */}
       {data.map((posts) => {
         return (
-          <div className="card">
+          <div key={posts._id} className="card">
             {/* card header */}
             <div className="card-header">
               <div className="card-pic">
@@ -312,4 +322,24 @@ return ()=>{
       )}
     </div>
   );
+}
+
+async function checkLoginStatus(navigate) {
+  await fetch(process.env.REACT_APP_BACKEND_URL + "/api/protected-route", {
+    method: "GET",
+    credentials: "include",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.message === "Authorized") {
+        //  console.log("User is authenticated");
+        return;
+      } else {
+        // console.log("User is not authenticated");
+        navigate("./signin");
+
+        return;
+      }
+    })
+    .catch((error) => console.error(error));
 }

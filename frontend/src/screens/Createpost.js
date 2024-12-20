@@ -1,112 +1,155 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../css/Createpost.css";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Createpost() {
   const [body, setBody] = useState("");
-  const [image, setImage] = useState("")
-  const [url, setUrl] = useState("")
-  const navigate = useNavigate()
+  const [files, setFiles] = useState([]);
+  const navigate = useNavigate();
 
   // Toast functions
-  const notifyA = (msg) => toast.error(msg)
-  const notifyB = (msg) => toast.success(msg)
+  const notifyA = (msg) => toast.error(msg);
+  const notifyB = (msg) => toast.success(msg);
 
-
-  useEffect(() => {
-
-    // saving post to mongodb
-    if (url) {
-
-      fetch("/createPost", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + localStorage.getItem("jwt")
-        },
-        body: JSON.stringify({
-          body,
-          pic: url
-        })
-      }).then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            notifyA(data.error)
-          } else {
-            notifyB("Successfully Posted")
-            navigate("/")
-          }
-        })
-        .catch(err => console.log(err))
+  const postDetails = async () => {
+    if (!body) {
+      notifyA("Caption cannot be empty.");
+      return;
     }
 
-  }, [url])
+    if (files.length === 0) {
+      notifyA("Please select at least one file to upload.");
+      return;
+    }
 
+    const isValid = await validatePostFiles(
+      Array.from(files),
+      notifyA,
+      notifyB
+    );
 
-  // posting image to cloudinary
-  const postDetails = () => {
+    if (!isValid) return;
 
-    console.log(body, image)
-    const data = new FormData()
-    data.append("file", image)
-    data.append("upload_preset", "insta-clone")
-    data.append("cloud_name", "cantacloud2")
-    fetch("https://api.cloudinary.com/v1_1/cantacloud2/image/upload", {
-      method: "post",
-      body: data
-    }).then(res => res.json())
-      .then(data => setUrl(data.url))
-      .catch(err => console.log(err))
-    console.log(url)
+    const formData = new FormData();
+    formData.append("body", body);
 
-  }
+    Array.from(files).forEach((file) => {
+      formData.append("files", file);
+    });
 
+    try {
+      const url = process.env.REACT_APP_BACKEND_URL;
 
-  const loadfile = (event) => {
-    var output = document.getElementById("output");
-    output.src = URL.createObjectURL(event.target.files[0]);
-    output.onload = function () {
-      URL.revokeObjectURL(output.src); // free memory
-    };
+      const response = await axios.post(url + "/createPost", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+
+      if (response.status === 201) {
+        notifyB("Post created successfully!");
+        navigate("/");
+      } else {
+        notifyA("Failed to create post. Try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      notifyA("An error occurred while creating the post.");
+    }
   };
+
+  const loadFilePreview = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const output = document.getElementById("output");
+      output.src = URL.createObjectURL(file);
+      output.onload = () => URL.revokeObjectURL(output.src); // Free memory
+    }
+  };
+
   return (
     <div className="createPost">
-      {/* //header */}
+      {/* Header */}
       <div className="post-header">
         <h4 style={{ margin: "3px auto" }}>Create New Post</h4>
-        <button id="post-btn" onClick={() => { postDetails() }}>Share</button>
+        <button id="post-btn" onClick={postDetails}>
+          Share
+        </button>
       </div>
-      {/* image preview */}
+
+      {/* Image/Video Preview */}
       <div className="main-div">
         <img
           id="output"
           src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-image-512.png"
+          alt="Preview"
         />
         <input
           type="file"
-          accept="image/*"
+          multiple
+          accept="image/*,video/*"
           onChange={(event) => {
-            loadfile(event);
-            setImage(event.target.files[0])
+            loadFilePreview(event);
+            setFiles(event.target.files);
           }}
         />
       </div>
-      {/* details */}
+
+      {/* Caption */}
       <div className="details">
         <div className="card-header">
-          <div className="card-pic">
-            <img
-              src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8MnwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-              alt=""
-            />
-          </div>
-          <h5>Ramesh</h5>
+          <div className="card-pic">{/* Profile picture placeholder */}</div>
         </div>
-        <textarea value={body} onChange={(e) => {
-          setBody(e.target.value)
-        }} type="text" placeholder="Write a caption...."></textarea>
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          type="text"
+          placeholder="Write a caption...."
+        ></textarea>
       </div>
     </div>
   );
 }
+
+const validatePostFiles = async (files, notifyA, notifyB) => {
+  const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+  const MAX_VIDEO_DURATION = 600; // 10 minutes in seconds
+
+  let isValid = true;
+
+  for (let file of files) {
+    // Check file size
+
+    if (file.size > MAX_FILE_SIZE) {
+      notifyA(`File ${file.name} exceeds the maximum size of 500MB.`);
+      isValid = false;
+      continue;
+    }
+
+    // Check video duration
+    if (file.type.startsWith("video/")) {
+      const video = document.createElement("video");
+      video.src = URL.createObjectURL(file);
+
+      // Wait for the metadata to load
+      const duration = await new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+          resolve(video.duration);
+          URL.revokeObjectURL(video.src); // Free memory
+        };
+      });
+
+      if (duration > MAX_VIDEO_DURATION) {
+        notifyA(
+          `Video ${file.name} exceeds the maximum duration of 10 minutes.`
+        );
+        isValid = false;
+      }
+    }
+  }
+
+  return isValid;
+};

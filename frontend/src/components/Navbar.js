@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import logo from "../img/logo.png";
 import "../css/Navbar.css";
 import { Link } from "react-router-dom";
@@ -6,13 +6,15 @@ import { LoginContext } from "../context/LoginContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Navbar({ login }) {
-  const navigate = useNavigate();
   const { setModalOpen } = useContext(LoginContext);
+  const navigate = useNavigate();
 
   const loginStatus = () => {
     const token = localStorage.getItem("jwt");
+    //const indexes = [1,2,3,4]
+
     if (login || token) {
-      return [
+      return (
         <>
           <Link to="/profile">
             <li>Profile</li>
@@ -26,10 +28,10 @@ export default function Navbar({ login }) {
               Log Out
             </button>
           </Link>
-        </>,
-      ];
+        </>
+      );
     } else {
-      return [
+      return (
         <>
           <Link to="/signup">
             <li>SignUp</li>
@@ -37,14 +39,14 @@ export default function Navbar({ login }) {
           <Link to="/signin">
             <li>SignIn</li>
           </Link>
-        </>,
-      ];
+        </>
+      );
     }
   };
   const loginStatusMobile = () => {
     const token = localStorage.getItem("jwt");
     if (login || token) {
-      return [
+      return (
         <>
           <Link to="/">
             <li>
@@ -71,10 +73,10 @@ export default function Navbar({ login }) {
               <span class="material-symbols-outlined">logout</span>
             </li>
           </Link>
-        </>,
-      ];
+        </>
+      );
     } else {
-      return [
+      return (
         <>
           <Link to="/signup">
             <li>SignUp</li>
@@ -82,8 +84,8 @@ export default function Navbar({ login }) {
           <Link to="/signin">
             <li>SignIn</li>
           </Link>
-        </>,
-      ];
+        </>
+      );
     }
   };
 
