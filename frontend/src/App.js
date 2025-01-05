@@ -17,32 +17,53 @@ import MyFolliwngPost from "./screens/MyFollowingPost";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import ProtectedRoutes from "./components/wrappers/ProtectedRoutes";
+import { QueryClient, QueryClientProvider } from "react-query";
+import "@fontsource/roboto"; // Defaults to weight 400
+import HomePostsContextProvider from "./context/HomePostsContext";
+
+const queryClient = new QueryClient();
+
 function App() {
   const [userLogin, setUserLogin] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <BrowserRouter>
-      <div className="App">
+    <div className="App">
+      <QueryClientProvider client={queryClient}>
         <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
           <LoginContext.Provider value={{ setUserLogin, setModalOpen }}>
-            <Navbar login={userLogin} />
-            <Routes>
-              <Route path="/" element={<Home />}></Route>
-              <Route path="/signup" element={<SignUp />}></Route>
-              <Route path="/signin" element={<SignIn />}></Route>
-              <Route exact path="/profile" element={<Profie />}></Route>
-              <Route path="/createPost" element={<Createpost />}></Route>
-              <Route path="/profile/:userid" element={<UserProfie />}></Route>
-              <Route path="/followingpost" element={<MyFolliwngPost />}></Route>
-            </Routes>
-            <ToastContainer theme="dark" />
+            <HomePostsContextProvider>
+              <BrowserRouter>
+                <Navbar login={userLogin} />
 
-            {modalOpen && <Modal setModalOpen={setModalOpen}></Modal>}
+                <Routes>
+                  <Route element={<ProtectedRoutes />}>
+                    <Route path="/" element={<Home />}></Route>
+                    <Route exact path="/profile" element={<Profie />}></Route>
+                    <Route path="/createPost" element={<Createpost />}></Route>
+                    <Route
+                      path="/profile/:userid"
+                      element={<UserProfie />}
+                    ></Route>
+                    <Route
+                      path="/followingpost"
+                      element={<MyFolliwngPost />}
+                    ></Route>
+                  </Route>
+
+                  <Route path="/signup" element={<SignUp />}></Route>
+                  <Route path="/signin" element={<SignIn />}></Route>
+                </Routes>
+                <ToastContainer theme="dark" />
+
+                {modalOpen && <Modal setModalOpen={setModalOpen}></Modal>}
+              </BrowserRouter>
+            </HomePostsContextProvider>
           </LoginContext.Provider>
         </GoogleOAuthProvider>
-      </div>
-    </BrowserRouter>
+      </QueryClientProvider>
+    </div>
   );
 }
 

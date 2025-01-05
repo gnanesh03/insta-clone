@@ -1,0 +1,12 @@
+.post_gallery_container {
+  display: flex;
+  gap: 2px;
+  width: 920px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .post_gallery_container {
+    width: 390px;
+  }
+}

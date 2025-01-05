@@ -1,0 +1,23 @@
+.item {
+  border-radius: 1px;
+  width: 300px;
+  height: 300px;
+  border: 1px solid lightgrey;
+}
+
+.blank_image {
+  background-color: black;
+}
+
+.image {
+  width: inherit;
+  height: inherit;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .item {
+    width: 127px;
+    height: 127px;
+  }
+}

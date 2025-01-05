@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import PostDetail from "./PostDetail";
 import "../css/Profile.css";
 import { useParams } from "react-router-dom";
-
+import PostGallery from "../components/Post/PostGallery/PostGallery";
 export default function UserProfie() {
   var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png";
   const { userid } = useParams();
@@ -63,7 +62,7 @@ export default function UserProfie() {
       .then((result) => {
         console.log(result);
         setUser(result.user);
-        setPosts(result.post);
+        setPosts(result.posts);
         if (
           result.user.followers.includes(
             JSON.parse(localStorage.getItem("user"))._id
@@ -106,9 +105,9 @@ export default function UserProfie() {
             </button>
           </div>
           <div className="profile-info" style={{ display: "flex" }}>
-            <p>{posts.length} posts</p>
-            <p>{user.followers ? user.followers.length : "0"} followers</p>
-            <p>{user.following ? user.following.length : "0"} following</p>
+            <p>{posts?.length} posts</p>
+            <p>{user?.followers ? user?.followers.length : "0"} followers</p>
+            <p>{user?.following ? user?.following.length : "0"} following</p>
           </div>
         </div>
       </div>
@@ -121,23 +120,7 @@ export default function UserProfie() {
         }}
       />
       {/* Gallery */}
-      <div className="gallery">
-        {posts.map((pics) => {
-          return (
-            <img
-              key={pics._id}
-              src={pics.photo}
-              // onClick={() => {
-              //     toggleDetails(pics)
-              // }}
-              className="item"
-            ></img>
-          );
-        })}
-      </div>
-      {/* {show &&
-        <PostDetail item={posts} toggleDetails={toggleDetails} />
-      } */}
+      {<PostGallery items={posts} />}
     </div>
   );
 }

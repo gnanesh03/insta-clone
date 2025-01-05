@@ -1,21 +1,24 @@
-.profile {
-  max-width: 600px;
-  margin: 10px auto;
+.profile-fram-wrapper-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .profile-fram-wrapper-div {
+    align-items: baseline;
+  }
 }
 
 .profile-frame {
   display: flex;
-  justify-content: space-evenly;
 }
 
-.profile-pic {
-  height: fit-content;
-}
 .profile-pic > img {
   width: 160px;
   height: 160px;
-  object-fit: contain;
-  border-radius: 100px;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .profile-data {
@@ -23,17 +26,6 @@
 }
 .profile-info p {
   padding: 0px 5px;
-}
-
-.gallery {
-  display: flex;
-  flex-wrap: wrap;
-  text-align: center;
-}
-
-.gallery img {
-  width: 30%;
-  margin: 10px;
 }
 
 .followBtn {

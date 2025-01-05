@@ -4,7 +4,7 @@ function setJWTInCookie(res, token) {
     secure: process.env.NODE_ENVIRONMENT === "production",
     // sameSite: "strict",
     // maxAge: 300000, // 5 minutes
-    maxAge: 3600000, //1 hour
+    maxAge: 3600000 * 2, //2 hours
     path: "/",
   });
 }

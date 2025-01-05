@@ -4,16 +4,19 @@ import "../css/Navbar.css";
 import { Link } from "react-router-dom";
 import { LoginContext } from "../context/LoginContext";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export default function Navbar({ login }) {
   const { setModalOpen } = useContext(LoginContext);
   const navigate = useNavigate();
 
+  // console.log("navbar rendered");
+
   const loginStatus = () => {
     const token = localStorage.getItem("jwt");
     //const indexes = [1,2,3,4]
 
-    if (login || token) {
+    if (Cookies.get("is_logged_in") === "true") {
       return (
         <>
           <Link to="/profile">
@@ -45,32 +48,32 @@ export default function Navbar({ login }) {
   };
   const loginStatusMobile = () => {
     const token = localStorage.getItem("jwt");
-    if (login || token) {
+    if (Cookies.get("is_logged_in") === "true") {
       return (
         <>
           <Link to="/">
             <li>
-              <span class="material-symbols-outlined">home</span>
+              <span className="material-symbols-outlined">home</span>
             </li>
           </Link>
           <Link to="/profile">
             <li>
-              <span class="material-symbols-outlined">account_circle</span>
+              <span className="material-symbols-outlined">account_circle</span>
             </li>
           </Link>
           <Link to="/createPost">
             <li>
-              <span class="material-symbols-outlined">add_box</span>
+              <span className="material-symbols-outlined">add_box</span>
             </li>
           </Link>
           <Link style={{ marginLeft: "20px" }} to="/followingpost">
             <li>
-              <span class="material-symbols-outlined">explore</span>
+              <span className="material-symbols-outlined">explore</span>
             </li>
           </Link>
           <Link to={""}>
             <li onClick={() => setModalOpen(true)}>
-              <span class="material-symbols-outlined">logout</span>
+              <span className="material-symbols-outlined">logout</span>
             </li>
           </Link>
         </>
@@ -95,6 +98,7 @@ export default function Navbar({ login }) {
         id="insta-logo"
         src={logo}
         alt=""
+        className="navbar-main-logo"
         onClick={() => {
           navigate("/");
         }}

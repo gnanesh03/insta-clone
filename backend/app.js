@@ -20,6 +20,7 @@ app.use(express.json());
 app.use(require("./routes/auth"));
 app.use(require("./routes/createPost"));
 app.use(require("./routes/user"));
+app.use(require("./routes/Bundles.js"));
 app.use(require("./routes/test routes/SignedUrl.js"));
 
 connectToMongoDB(mongoose);

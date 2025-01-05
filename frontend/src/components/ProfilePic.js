@@ -1,47 +1,40 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 
 export default function ProfilePic({ changeprofile }) {
   const hiddenFileInput = useRef(null);
-  const [image, setImage] = useState("");
-  const [url, setUrl] = useState("");
+  const [image, setImage] = useState(null);
 
-  // posting image to cloudinary
-  const postDetails = () => {
-    const data = new FormData();
-    data.append("file", image);
-    data.append("upload_preset", "insta-clone");
-    data.append("cloud_name", "cantacloud2");
-    fetch("https://api.cloudinary.com/v1_1/cantacloud2/image/upload", {
-      method: "post",
-      body: data,
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setUrl(data.url))
-      .catch((err) => console.log(err));
-    console.log(url);
-  };
+  // Handle uploading profile picture to backend
+  const postPic = async () => {
+    const formData = new FormData();
+    formData.append("file", image);
 
-  const postPic = () => {
-    // saving post to mongodb
-    fetch(process.env.REACT_APP_BACKEND_URL + "/uploadProfilePic", {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("jwt"),
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        pic: url,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        changeprofile();
-        window.location.reload();
-      })
-      .catch((err) => console.log(err));
+    try {
+      const url = process.env.REACT_APP_BACKEND_URL + "/uploadProfilePic";
+
+      // Posting the form data to your backend
+      const response = await axios.put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer " + localStorage.getItem("jwt"),
+        },
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        console.log("Profile picture updated successfully!");
+        setImage(null);
+        changeprofile(); // Call the function passed via props to update profile
+        window.location.reload(); // Reload to apply the changes
+      } else {
+        console.log("Failed to upload profile picture.");
+        setImage(null);
+      }
+    } catch (error) {
+      setImage(null);
+      console.error("Error uploading profile picture:", error);
+    }
   };
 
   const handleClick = () => {
@@ -49,15 +42,13 @@ export default function ProfilePic({ changeprofile }) {
   };
 
   useEffect(() => {
-    if (image) {
-      postDetails();
-    }
-  }, [image]);
-  useEffect(() => {
-    if (url) {
+    if (!image) {
+      return;
+    } else {
       postPic();
     }
-  }, [url]);
+  }, [image]);
+
   return (
     <div className="profilePic darkBg">
       <div className="changePic centered">
@@ -77,17 +68,15 @@ export default function ProfilePic({ changeprofile }) {
             ref={hiddenFileInput}
             accept="image/*"
             style={{ display: "none" }}
-            onChange={(e) => {
-              setImage(e.target.files[0]);
-            }}
+            onChange={(e) => setImage(e.target.files[0])}
           />
         </div>
         <div style={{ borderTop: "1px solid #00000030" }}>
           <button
             className="upload-btn"
             onClick={() => {
-              setUrl(null);
-              postPic();
+              setImage(null); // To remove the selected image
+              postPic(); // Upload the image to backend (even for removal)
             }}
             style={{ color: "#ED4956" }}
           >

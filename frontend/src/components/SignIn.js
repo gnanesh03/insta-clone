@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { LoginContext } from "../context/LoginContext";
 import { MyGoogleLogin } from "./GoogleLogin/GoogleLogin";
+import Cookies from "js-cookie";
 
 export default function SignIn() {
   const { setUserLogin } = useContext(LoginContext);
@@ -44,6 +45,7 @@ export default function SignIn() {
           notifyB("Signed In Successfully");
           console.log(data);
           //  localStorage.setItem("jwt", data.token);
+          Cookies.set("is_logged_in", "true", { expires: 2 / 24 }); //2 hours
           localStorage.setItem("user", JSON.stringify(data.user));
 
           setUserLogin(true);

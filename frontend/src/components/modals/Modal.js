@@ -9,16 +9,16 @@ const Modal = ({ children, message, setIsModalOpen, otherFunction }) => {
       }}
     >
       <div
-        class="popup"
+        className="popup"
         onClick={(e) => {
           e.stopPropagation();
         }}
       >
-        <h2 class="message">{message}</h2>
+        <h2 className="message">{message}</h2>
         {children}
 
         <button
-          class="close-button"
+          className="close-button"
           onClick={() => {
             setIsModalOpen(false);
           }}

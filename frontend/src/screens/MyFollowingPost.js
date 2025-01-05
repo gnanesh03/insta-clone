@@ -3,6 +3,7 @@ import "../css/Home.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import HorizontalSlider from "../components/Post/PostContentSlider";
 
 export default function MyFolliwngPost() {
   const navigate = useNavigate();
@@ -16,11 +17,6 @@ export default function MyFolliwngPost() {
   const notifyB = (msg) => toast.success(msg);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    if (!token) {
-      navigate("./signup");
-    }
-
     // Fetching all posts
     fetch(process.env.REACT_APP_BACKEND_URL + "/myfollwingpost", {
       headers: {
@@ -132,7 +128,7 @@ export default function MyFolliwngPost() {
       {/* card */}
       {data.map((posts) => {
         return (
-          <div className="card">
+          <div key={posts._id} className="card">
             {/* card header */}
             <div className="card-header">
               <div className="card-pic">
@@ -148,9 +144,7 @@ export default function MyFolliwngPost() {
               </h5>
             </div>
             {/* card image */}
-            <div className="card-image">
-              <img src={posts.photo} alt="" />
-            </div>
+            <HorizontalSlider items={posts.photo} />
 
             {/* card content */}
             <div className="card-content">

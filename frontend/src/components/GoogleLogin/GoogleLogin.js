@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { LoginContext } from "../../context/LoginContext";
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export function MyGoogleLogin() {
   const [user_name, setUserName] = useState("");
@@ -33,6 +34,8 @@ export function MyGoogleLogin() {
 
       if (res.data.token) {
         // localStorage.setItem("jwt", res.data.token);
+        Cookies.set("is_logged_in", "true", { expires: 2 / 24 }); //2 hours
+
         localStorage.setItem("user", JSON.stringify(res.data.user));
         toastNotifySuccess("Successfully logged in ");
 
@@ -50,7 +53,7 @@ export function MyGoogleLogin() {
     try {
       const url =
         process.env.REACT_APP_BACKEND_URL + "/api/register-using-google";
-      const res = await axios.post(
+      const res = await axios.get(
         url,
         {
           user_name,
@@ -62,6 +65,8 @@ export function MyGoogleLogin() {
       );
 
       toastNotifySuccess("Successfully logged in ");
+      Cookies.set("is_logged_in", "true", { expires: 2 / 24 }); //2 hours
+
       //localStorage.setItem("jwt", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setUserLogin(true);

@@ -4,32 +4,77 @@ const mongoose = require("mongoose");
 const requireLogin = require("../middlewares/requireLogin");
 const { route } = require("./auth");
 const multer = require("multer");
-const validateFiles = require("../utilities/files/FileValidation");
+const { validateFiles } = require("../utilities/files/FileValidation");
+
+const ObjectId = mongoose.Types.ObjectId;
+
 const {
   uploadFiles,
   createSignedUrls,
 } = require("../utilities/supabase/uploadFiles");
 const POST = mongoose.model("POST");
+const COMMENT = mongoose.model("COMMENT");
+const LIKE = mongoose.model("LIKE");
+const COMMENT_REPLY = mongoose.model("COMMENT_REPLY");
 
-// Route
+// all posts
 router.get("/allposts", requireLogin, async (req, res) => {
-  let limit = req.query.limit;
-  let skip = req.query.skip;
-  POST.find()
-    .populate("postedBy", "_id name Photo")
-    .populate("comments.postedBy", "_id name")
-    .skip(parseInt(skip))
-    .limit(parseInt(limit))
-    .sort("-createdAt")
-    .then(async (posts) => {
-      // add signed urls to the photo field
-      for (const post of posts) {
-        const file_urls = await createSignedUrls(post.photo);
-        post.photo = file_urls;
-      }
-      res.json(posts);
-    })
-    .catch((err) => console.log(err));
+  let limit = Number(req.query.limit);
+  let skip = Number(req.query.skip);
+
+  console.log("limit-", limit);
+  console.log("skip-", skip);
+  console.log("----------------------------");
+
+  try {
+    const posts = await POST.aggregate([
+      { $match: {} },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "post_id",
+          as: "likes",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "postedBy",
+          foreignField: "_id",
+          as: "postedBy",
+        },
+      },
+
+      {
+        // modify postedBy field to change it from array to object
+        $addFields: {
+          postedBy: { $arrayElemAt: ["$postedBy", 0] },
+        },
+      },
+      {
+        $project: {
+          body: 1,
+          photo: 1,
+          postedBy: { _id: 1, userName: 1, Photo: 1 },
+          likes: { user_id: 1 },
+          createdAt: 1,
+        },
+      },
+    ]);
+
+    // Add signed URLs to photos
+    for (const post of posts) {
+      post.photo = await createSignedUrls(post.photo);
+    }
+
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(400).json({ message: error });
+  }
 });
 
 router.post(
@@ -94,69 +139,86 @@ router.get("/myposts", requireLogin, (req, res) => {
     });
 });
 
-router.put("/like", requireLogin, (req, res) => {
-  POST.findByIdAndUpdate(
-    req.body.postId,
-    {
-      $push: { likes: req.user._id },
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("postedBy", "_id name Photo")
-    .exec((err, result) => {
-      if (err) {
-        return res.status(422).json({ error: err });
-      } else {
-        res.json(result);
-      }
+router.put("/like", requireLogin, async (req, res) => {
+  try {
+    // Check if the user has already liked the post
+    const existingLike = await LIKE.findOne({
+      post_id: mongoose.Types.ObjectId(req.body.postId),
+      user_id: mongoose.Types.ObjectId(req.user._id),
     });
+
+    if (existingLike) {
+      return res
+        .status(400)
+        .json({ error: "You have already liked this post." });
+    }
+
+    // Create a new like if it doesn't exist
+    const result = await LIKE.create({
+      post_id: mongoose.Types.ObjectId(req.body.postId),
+      user_id: mongoose.Types.ObjectId(req.user._id),
+    });
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
 });
 
-router.put("/unlike", requireLogin, (req, res) => {
-  POST.findByIdAndUpdate(
-    req.body.postId,
-    {
-      $pull: { likes: req.user._id },
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("postedBy", "_id name Photo")
-    .exec((err, result) => {
-      if (err) {
-        return res.status(422).json({ error: err });
-      } else {
-        res.json(result);
-      }
+router.put("/unlike", requireLogin, async (req, res) => {
+  try {
+    // Find and delete the like entry for the user and the post
+    const result = await LIKE.findOneAndDelete({
+      post_id: mongoose.Types.ObjectId(req.body.postId),
+      user_id: mongoose.Types.ObjectId(req.user._id),
     });
+
+    if (!result) {
+      return res.status(400).json({ error: "You haven't liked this post." });
+    }
+
+    res.status(200).json({ message: "Post unliked successfully." });
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
 });
 
-router.put("/comment", requireLogin, (req, res) => {
-  const comment = {
-    comment: req.body.text,
-    postedBy: req.user._id,
-  };
-  POST.findByIdAndUpdate(
-    req.body.postId,
-    {
-      $push: { comments: comment },
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("comments.postedBy", "_id name")
-    .populate("postedBy", "_id name Photo")
-    .exec((err, result) => {
-      if (err) {
-        return res.status(422).json({ error: err });
-      } else {
-        res.json(result);
-      }
+router.put("/comment", requireLogin, async (req, res) => {
+  try {
+    const { text, postId } = req.body;
+
+    // Create a new comment
+    const newComment = new COMMENT({
+      post_id: mongoose.Types.ObjectId(postId),
+      posted_by: mongoose.Types.ObjectId(req.user._id),
+      body: text,
     });
+
+    await newComment.save();
+
+    res.status(200).json({ message: "Comment posted successfully." });
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
+});
+
+router.post("/reply-to-comment", requireLogin, async (req, res) => {
+  try {
+    const { text, comment_id } = req.body;
+
+    // Create a new comment
+    const comment_reply = new COMMENT_REPLY({
+      comment_id: mongoose.Types.ObjectId(comment_id),
+      posted_by: mongoose.Types.ObjectId(req.user._id),
+      body: text,
+    });
+
+    await comment_reply.save();
+
+    res.status(200).json({ message: "reply posted successfully." });
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
 });
 
 // Api to delete post
@@ -186,7 +248,12 @@ router.get("/myfollwingpost", requireLogin, (req, res) => {
   POST.find({ postedBy: { $in: req.user.following } })
     .populate("postedBy", "_id name")
     .populate("comments.postedBy", "_id name")
-    .then((posts) => {
+    .then(async (posts) => {
+      // add signed urls to the photo field
+      for (const post of posts) {
+        const file_urls = await createSignedUrls(post.photo);
+        post.photo = file_urls;
+      }
       res.json(posts);
     })
     .catch((err) => {

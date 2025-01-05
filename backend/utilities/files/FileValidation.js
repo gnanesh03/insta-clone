@@ -18,4 +18,17 @@ const validateFiles = multer({
   },
 });
 
-module.exports = validateFiles;
+const validateProfileImage = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max size for profile pictures
+  fileFilter: (req, file, cb) => {
+    // Validate that the file is an image
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only images are allowed."), false);
+    }
+  },
+});
+
+module.exports = { validateFiles, validateProfileImage };

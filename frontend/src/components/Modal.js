@@ -2,7 +2,7 @@ import React from "react";
 import { RiCloseLine } from "react-icons/ri";
 import "../css/Modal.css";
 import { useNavigate } from "react-router-dom";
-
+import Cookies from "js-cookie";
 export default function Modal({ setModalOpen }) {
   const navigate = useNavigate();
   return (
@@ -25,6 +25,7 @@ export default function Modal({ setModalOpen }) {
                 onClick={() => {
                   setModalOpen(false);
                   localStorage.clear();
+                  Cookies.remove("is_logged_in");
                   navigate("./signin");
                 }}
               >
