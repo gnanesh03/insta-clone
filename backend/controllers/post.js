@@ -1,30 +1,46 @@
-const express = require("express");
 const mongoose = require("mongoose");
-const requireLogin = require("../middlewares/requireLogin");
-
-const router = express.Router();
 const ObjectId = mongoose.Types.ObjectId;
+const { createSignedUrls } = require("../utilities/supabase/uploadFiles");
 
-const POST = mongoose.model("POST");
-const COMMENT = mongoose.model("COMMENT");
-const LIKE = mongoose.model("LIKE");
-
-const {
-  uploadFiles,
-  createSignedUrls,
-} = require("../utilities/supabase/uploadFiles");
-
-router.get("/comments-of-post", requireLogin, async (req, res) => {
-  //console.log("being called");
-
-  const { post_id } = req.query;
-
-  if (!post_id) {
-    return res.status(400).json({ error: "post id is required" });
-  }
-
+const getPostDetails = async (post_id) => {
   try {
-    const comments = await COMMENT.aggregate([
+    let post_data = await mongoose.model("POST").aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(post_id) } },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "post_id",
+          as: "likes",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "postedBy",
+          foreignField: "_id",
+          as: "postedBy",
+        },
+      },
+
+      {
+        // modify postedBy field to change it from array to object
+        $addFields: {
+          postedBy: { $arrayElemAt: ["$postedBy", 0] },
+        },
+      },
+      {
+        $project: {
+          body: 1,
+          photo: 1,
+          postedBy: { _id: 1, userName: 1, Photo: 1 },
+          likes: { user_id: 1 },
+          createdAt: 1,
+        },
+      },
+    ]);
+
+    const comments_data = await mongoose.model("COMMENT").aggregate([
       // Match comments for the given post_id
       { $match: { post_id: ObjectId(post_id) } },
 
@@ -126,86 +142,16 @@ router.get("/comments-of-post", requireLogin, async (req, res) => {
       },
     ]);
 
-    return res.status(200).json(comments);
-  } catch (error) {
-    console.log(error);
-    return res.status(400).json({ error });
-  }
-});
-
-router.get("/trending-posts", requireLogin, async (req, res) => {
-  let limit = Number(req.query.limit);
-  let skip = Number(req.query.skip);
-  //first we need to get all posts from last two weeks
-  try {
-    const posts = await POST.aggregate([
-      //stage 1 first we need to get all posts from last two weeks
-      {
-        $match: {
-          createdAt: {
-            $gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-          },
-        },
-      },
-
-      //stage 2
-      { $sort: { popularity_score: -1 } },
-
-      { $skip: skip },
-
-      { $limit: limit },
-
-      //stage
-      {
-        $lookup: {
-          from: "likes",
-          localField: "_id",
-          foreignField: "post_id",
-          as: "likes",
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "postedBy",
-          foreignField: "_id",
-          as: "postedBy",
-        },
-      },
-
-      {
-        // modify postedBy field to change it from array to object
-        $addFields: {
-          postedBy: { $arrayElemAt: ["$postedBy", 0] },
-        },
-      },
-      {
-        $project: {
-          body: 1,
-          photo: 1,
-          postedBy: { _id: 1, userName: 1, Photo: 1 },
-          likes: { user_id: 1 },
-          createdAt: 1,
-          popularity_score: 1,
-        },
-      },
-    ]);
+    post_data = post_data[0];
 
     // Add signed URLs to photos
-    for (const post of posts) {
-      post.photo = await createSignedUrls(post.photo);
-    }
+    post_data.photo = await createSignedUrls(post_data.photo);
 
-    let has_more = true;
-    const total_posts = await POST.countDocuments();
-    if (skip + limit >= total_posts) {
-      has_more = false;
-    }
-
-    res.status(200).json({ posts, has_more });
+    return { post_data, comments_data };
   } catch (error) {
-    res.status(400).json({ message: error });
+    console.log(error);
+    throw error;
   }
-});
+};
 
-module.exports = router;
+module.exports = getPostDetails;

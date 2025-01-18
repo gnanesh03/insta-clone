@@ -3,18 +3,28 @@
   object-fit: contain;
 }
 
+.company-logo {
+  margin-right: auto;
+  margin-left: 30px;
+}
+
 .navbar {
   display: flex;
   justify-content: space-around;
-
+  position: fixed;
   box-shadow: 1px 5px 5px #e0dcdc;
+  left: 0px;
+  right: 3px;
+  z-index: 100;
+  background-color: white;
+  top: 0px;
 }
 
 .nav-mobile {
   display: none;
 }
 
-ul {
+.nav-menu {
   display: flex;
   align-items: baseline;
 }
@@ -47,9 +57,9 @@ a {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px -10px rgba(219, 24, 44, 0.6);
 }
-
+/* 
 @media screen and (max-width: 800px) {
-  #insta-logo {
+  .company-logo {
     display: none;
   }
   .nav-menu {
@@ -67,9 +77,10 @@ a {
     left: 0;
     background-color: #fff;
     box-shadow: 0px -2px 5px #fff;
+    z-index: 100;
   }
   .navbar ul {
     margin: 0;
     padding: 10px 0px;
   }
-}
+} */

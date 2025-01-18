@@ -18,6 +18,8 @@ const postSchema = new mongoose.Schema(
       type: ObjectId,
       ref: "USER",
     },
+
+    popularity_score: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

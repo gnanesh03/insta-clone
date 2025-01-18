@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import logo from "../img/logo.png";
+import CompanyLogo from "./logo/CompanyLogo";
 import "../css/Navbar.css";
 import { Link } from "react-router-dom";
 import { LoginContext } from "../context/LoginContext";
@@ -19,12 +19,17 @@ export default function Navbar({ login }) {
     if (Cookies.get("is_logged_in") === "true") {
       return (
         <>
-          <Link to="/profile">
-            <li>Profile</li>
-          </Link>
           <Link to="/createPost">Create Post</Link>
           <Link style={{ marginLeft: "20px" }} to="/followingpost">
             My Following
+          </Link>
+
+          <Link to="/trending-posts" style={{ marginLeft: "20px" }}>
+            Trending
+          </Link>
+
+          <Link to="/profile">
+            <li>Profile</li>
           </Link>
           <Link to={""}>
             <button className="primaryBtn" onClick={() => setModalOpen(true)}>
@@ -94,15 +99,15 @@ export default function Navbar({ login }) {
 
   return (
     <div className="navbar">
-      <img
-        id="insta-logo"
-        src={logo}
-        alt=""
-        className="navbar-main-logo"
+      <span
+        className="company-logo"
         onClick={() => {
           navigate("/");
         }}
-      />
+      >
+        <CompanyLogo />
+      </span>
+
       <ul className="nav-menu">{loginStatus()}</ul>
       <ul className="nav-mobile">{loginStatusMobile()}</ul>
     </div>

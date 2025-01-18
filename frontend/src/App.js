@@ -21,6 +21,10 @@ import ProtectedRoutes from "./components/wrappers/ProtectedRoutes";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "@fontsource/roboto"; // Defaults to weight 400
 import HomePostsContextProvider from "./context/HomePostsContext";
+import TrendingPostsContextProvider from "./context/TrendingPostsContext";
+import PostDetails from "./components/Post/IndividualPostPage/PostDetails";
+import TrendingPosts from "./screens/TrendingPosts";
+import Search from "./screens/Search";
 
 const queryClient = new QueryClient();
 
@@ -34,31 +38,48 @@ function App() {
         <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
           <LoginContext.Provider value={{ setUserLogin, setModalOpen }}>
             <HomePostsContextProvider>
-              <BrowserRouter>
-                <Navbar login={userLogin} />
+              <TrendingPostsContextProvider>
+                <BrowserRouter>
+                  <Navbar login={userLogin} />
 
-                <Routes>
-                  <Route element={<ProtectedRoutes />}>
-                    <Route path="/" element={<Home />}></Route>
-                    <Route exact path="/profile" element={<Profie />}></Route>
-                    <Route path="/createPost" element={<Createpost />}></Route>
-                    <Route
-                      path="/profile/:userid"
-                      element={<UserProfie />}
-                    ></Route>
-                    <Route
-                      path="/followingpost"
-                      element={<MyFolliwngPost />}
-                    ></Route>
-                  </Route>
+                  <Routes>
+                    <Route element={<ProtectedRoutes />}>
+                      <Route path="/" element={<Home />}></Route>
+                      <Route exact path="/profile" element={<Profie />}></Route>
+                      <Route
+                        path="/createPost"
+                        element={<Createpost />}
+                      ></Route>
+                      <Route
+                        path="/profile/:userid"
+                        element={<UserProfie />}
+                      ></Route>
+                      <Route
+                        path="/profile/:user_id/:post_id"
+                        element={<PostDetails />}
+                      />
 
-                  <Route path="/signup" element={<SignUp />}></Route>
-                  <Route path="/signin" element={<SignIn />}></Route>
-                </Routes>
-                <ToastContainer theme="dark" />
+                      <Route
+                        path="/followingpost"
+                        element={<MyFolliwngPost />}
+                      ></Route>
 
-                {modalOpen && <Modal setModalOpen={setModalOpen}></Modal>}
-              </BrowserRouter>
+                      <Route
+                        path="/trending-posts"
+                        element={<TrendingPosts />}
+                      />
+
+                      <Route path="/search" element={<Search />} />
+                    </Route>
+
+                    <Route path="/signup" element={<SignUp />}></Route>
+                    <Route path="/signin" element={<SignIn />}></Route>
+                  </Routes>
+                  <ToastContainer theme="dark" />
+
+                  {modalOpen && <Modal setModalOpen={setModalOpen}></Modal>}
+                </BrowserRouter>
+              </TrendingPostsContextProvider>
             </HomePostsContextProvider>
           </LoginContext.Provider>
         </GoogleOAuthProvider>

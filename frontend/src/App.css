@@ -9,3 +9,7 @@
 button {
   cursor: button;
 }
+
+a {
+  cursor: pointer;
+}

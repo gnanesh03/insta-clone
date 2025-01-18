@@ -1,0 +1,54 @@
+.root {
+  width: 230px;
+  bottom: 0px;
+  top: 75px;
+  position: fixed;
+  border: 1px solid lightgrey;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.top_section {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.bottom_section {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.link {
+  width: inherit;
+  height: 50px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  margin: 5px;
+  transition: background-color 0.3s ease, border-radius 0.3s ease;
+  padding-left: 3px;
+  cursor: pointer;
+}
+
+.link label {
+  margin-left: 20px;
+}
+
+.link svg {
+  width: 27px;
+  height: 27px;
+}
+
+.link:hover {
+  background-color: #ebedf0;
+  border-radius: 8px;
+}
+
+/* .more_button {
+  border: none;
+  background-color: white;
+  font-size: 18px;
+} */

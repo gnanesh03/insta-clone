@@ -1,0 +1,16 @@
+.root {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray;
+  opacity: 0.7;
+}
+
+.content {
+  width: 300px;
+}

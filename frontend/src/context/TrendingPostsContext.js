@@ -1,9 +1,9 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 
-export const HomePostsContext = createContext();
+export const TrendingPostsContext = createContext();
 
-const HomePostsContextProvider = ({ children }) => {
+const TrendingPostsContextProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +17,7 @@ const HomePostsContextProvider = ({ children }) => {
 
     try {
       const result = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/allposts`,
+        `${process.env.REACT_APP_BACKEND_URL}/trending-posts`,
         {
           params: { limit, skip: pageSkip },
           withCredentials: true,
@@ -25,6 +25,7 @@ const HomePostsContextProvider = ({ children }) => {
       );
 
       const newPosts = result.data.posts;
+      console.log(newPosts);
       setPosts((prevPosts) => [
         ...prevPosts,
         ...newPosts.filter(
@@ -42,12 +43,12 @@ const HomePostsContextProvider = ({ children }) => {
   };
 
   return (
-    <HomePostsContext.Provider
+    <TrendingPostsContext.Provider
       value={{ posts, fetchPosts, hasMore, isLoading, setPosts }}
     >
       {children}
-    </HomePostsContext.Provider>
+    </TrendingPostsContext.Provider>
   );
 };
 
-export default HomePostsContextProvider;
+export default TrendingPostsContextProvider;

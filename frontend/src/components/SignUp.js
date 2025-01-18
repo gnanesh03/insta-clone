@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
-import logo from "../img/logo.png";
 import "../css/SignUp.css";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { LoginContext } from "../context/LoginContext";
 import axios from "axios";
 import { MyGoogleLogin } from "./GoogleLogin/GoogleLogin";
+import CompanyLogo from "./logo/CompanyLogo";
 
 export default function SignUp() {
   const { setUserLogin } = useContext(LoginContext);
@@ -70,7 +70,10 @@ export default function SignUp() {
     <div className="signUp">
       <div className="form-container">
         <div className="form">
-          <img className="signUpLogo" src={logo} alt="" />
+          <span style={{ marginLeft: "70px" }}>
+            {" "}
+            <CompanyLogo />
+          </span>{" "}
           <p className="loginPara">
             Sign up to see photos and videos <br /> from your friends
           </p>

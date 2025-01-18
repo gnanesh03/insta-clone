@@ -12,6 +12,7 @@ const {
   uploadFiles,
   createSignedUrls,
 } = require("../utilities/supabase/uploadFiles");
+const getPostDetails = require("../controllers/post");
 const POST = mongoose.model("POST");
 const COMMENT = mongoose.model("COMMENT");
 const LIKE = mongoose.model("LIKE");
@@ -21,10 +22,6 @@ const COMMENT_REPLY = mongoose.model("COMMENT_REPLY");
 router.get("/allposts", requireLogin, async (req, res) => {
   let limit = Number(req.query.limit);
   let skip = Number(req.query.skip);
-
-  console.log("limit-", limit);
-  console.log("skip-", skip);
-  console.log("----------------------------");
 
   try {
     const posts = await POST.aggregate([
@@ -71,12 +68,19 @@ router.get("/allposts", requireLogin, async (req, res) => {
       post.photo = await createSignedUrls(post.photo);
     }
 
-    res.status(200).json(posts);
+    let has_more = true;
+    const total_posts = await POST.countDocuments();
+    if (skip + limit >= total_posts) {
+      has_more = false;
+    }
+
+    res.status(200).json({ posts, has_more });
   } catch (error) {
     res.status(400).json({ message: error });
   }
 });
 
+// to create a post
 router.post(
   "/createPost",
   requireLogin,
@@ -140,6 +144,7 @@ router.get("/myposts", requireLogin, (req, res) => {
 });
 
 router.put("/like", requireLogin, async (req, res) => {
+  console.log(req.body);
   try {
     // Check if the user has already liked the post
     const existingLike = await LIKE.findOne({
@@ -159,6 +164,13 @@ router.put("/like", requireLogin, async (req, res) => {
       user_id: mongoose.Types.ObjectId(req.user._id),
     });
 
+    // Incrementally update popularity score
+    await POST.findByIdAndUpdate(
+      { _id: mongoose.Types.ObjectId(req.body.postId) },
+      { $inc: { popularity_score: 0.1 } },
+      { new: true }
+    );
+
     res.status(200).json(result);
   } catch (err) {
     res.status(422).json({ error: err.message });
@@ -176,6 +188,12 @@ router.put("/unlike", requireLogin, async (req, res) => {
     if (!result) {
       return res.status(400).json({ error: "You haven't liked this post." });
     }
+
+    await POST.findByIdAndUpdate(
+      { _id: mongoose.Types.ObjectId(req.body.postId) },
+      { $inc: { popularity_score: -0.1 } },
+      { new: true }
+    );
 
     res.status(200).json({ message: "Post unliked successfully." });
   } catch (err) {
@@ -195,6 +213,12 @@ router.put("/comment", requireLogin, async (req, res) => {
     });
 
     await newComment.save();
+
+    await POST.findByIdAndUpdate(
+      { _id: mongoose.Types.ObjectId(req.body.postId) },
+      { $inc: { popularity_score: 0.3 } },
+      { new: true }
+    );
 
     res.status(200).json({ message: "Comment posted successfully." });
   } catch (err) {
@@ -259,6 +283,21 @@ router.get("/myfollwingpost", requireLogin, (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+});
+
+//to get the post details for a dynamic individual post page
+router.get("/single-post/:id", requireLogin, async (req, res) => {
+  const post_id = req.params.id;
+  if (!post_id) {
+    return res.status(400).json({ error: "post id is required" });
+  }
+  try {
+    let result = await getPostDetails(post_id);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
 });
 
 module.exports = router;

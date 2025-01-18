@@ -8,11 +8,18 @@
 
 .card-header {
   display: flex;
+  align-items: center;
 }
 
 .card-header > h5 {
   margin: 0;
   padding: 11px;
+}
+.menu-for-post-options {
+  margin-left: auto;
+
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .card-pic img {
@@ -50,7 +57,6 @@
 }
 
 .material-symbols-outlined {
-  color: #fd2f2f;
   font-size: 25px;
   cursor: pointer;
 }

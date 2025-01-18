@@ -1,11 +1,12 @@
 import React, { useContext, useRef, useEffect } from "react";
-import { HomePostsContext } from "../context/HomePostsContext";
+import { TrendingPostsContext } from "../context/TrendingPostsContext";
 import PostBox from "../components/Post/PostBox";
 import spinner_svg from "../img/tube-spinner.svg";
+import styles from "./TrendingPosts.module.css";
 
-export default function Home() {
+export default function TrendingPosts() {
   const { posts, fetchPosts, hasMore, isLoading, setPosts } =
-    useContext(HomePostsContext);
+    useContext(TrendingPostsContext);
   const observer_ref = useRef();
 
   // Observer to trigger fetching the next page
@@ -44,7 +45,7 @@ export default function Home() {
   };
 
   return (
-    <div className="home">
+    <div className={styles.root}>
       {isLoading && posts.length === 0 ? (
         <img className="home-page-loading-svg" src={spinner_svg} />
       ) : (

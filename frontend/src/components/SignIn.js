@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import "../css/SignIn.css";
-import logo from "../img/logo.png";
+import CompanyLogo from "./logo/CompanyLogo";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { LoginContext } from "../context/LoginContext";
@@ -59,7 +59,10 @@ export default function SignIn() {
     <div className="signIn">
       <div>
         <div className="loginForm">
-          <img className="signUpLogo" src={logo} alt="" />
+          <span style={{ marginLeft: "20px" }}>
+            {" "}
+            <CompanyLogo />
+          </span>
           <div>
             <input
               type="email"

@@ -3,11 +3,13 @@ import "../css/Createpost.css";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Loading from "../components/Loading/Loading";
 
 export default function Createpost() {
   const [body, setBody] = useState("");
   const [files, setFiles] = useState([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Toast functions
   const notifyA = (msg) => toast.error(msg);
@@ -40,6 +42,7 @@ export default function Createpost() {
     });
 
     try {
+      setIsLoading(true);
       const url = process.env.REACT_APP_BACKEND_URL;
 
       const response = await axios.post(url + "/createPost", formData, {
@@ -51,12 +54,14 @@ export default function Createpost() {
 
       if (response.status === 201) {
         notifyB("Post created successfully!");
+        setIsLoading(true);
         navigate("/");
       } else {
         notifyA("Failed to create post. Try again.");
       }
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
       notifyA("An error occurred while creating the post.");
     }
   };
@@ -72,6 +77,7 @@ export default function Createpost() {
 
   return (
     <div className="createPost">
+      {isLoading && <Loading />}
       {/* Header */}
       <div className="post-header">
         <h4 style={{ margin: "3px auto" }}>Create New Post</h4>

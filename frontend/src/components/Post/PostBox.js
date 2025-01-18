@@ -1,38 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HorizontalSlider from "./PostContentSlider";
 import "./PostBox.css";
 import axios from "axios";
 import PostModal from "../modals/PostModal";
+import PositionedMenu from "../Menu/MenuList";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 const PostBox = ({ post, updatePosts, height }) => {
   const [comment, setComment] = useState("");
+  const user_id = JSON.parse(localStorage.getItem("user"))._id;
+
   const [liked, setLiked] = useState(
-    post.likes.includes(JSON.parse(localStorage.getItem("user"))._id)
+    post?.likes.some(
+      (e) => e.user_id === JSON.parse(localStorage.getItem("user"))._id
+    )
   );
+
   const [is_comments_shown, setIsCommentsShown] = useState(false);
   const [comments, setComments] = useState([]);
 
+  // dynamic post page
+  const url = `/profile/${post?.postedBy._id}/${post?._id}`;
+
   // Handle Like
-  const likePost = (id) => {
-    fetch(process.env.REACT_APP_BACKEND_URL + "/like", {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("jwt"),
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        postId: id,
-      }),
-    })
-      .then((res) => {
-        if (res.status == 200) {
-          //  updatePosts(result); // Update the parent component with the new post data
-          setLiked(true); // Update the local liked state
-        }
-      })
-      .catch((err) => console.log(err));
+  const likePost = async (id) => {
+    try {
+      const url = process.env.REACT_APP_BACKEND_URL + "/like";
+      const result = await axios.put(
+        url,
+        { postId: id },
+        { withCredentials: true }
+      );
+      setLiked(true);
+      post.likes.push(result.data);
+      updatePosts(post);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Handle Unlike
@@ -50,7 +56,11 @@ const PostBox = ({ post, updatePosts, height }) => {
     })
       .then((res) => res.json())
       .then((result) => {
-        updatePosts(result); // Update the parent component with the new post data
+        let likes = post.likes.filter((e) => e.user_id !== user_id);
+        const updated_post = post;
+        updated_post.likes = likes;
+
+        updatePosts(updated_post); // Update the parent component with the new post data
         setLiked(false); // Update the local liked state
       })
       .catch((err) => console.log(err));
@@ -72,7 +82,6 @@ const PostBox = ({ post, updatePosts, height }) => {
     })
       .then((res) => res.json())
       .then((result) => {
-        updatePosts(result); // Update the parent component with the new post data
         setComment(""); // Clear the comment input field
       })
       .catch((err) => console.log(err));
@@ -91,7 +100,6 @@ const PostBox = ({ post, updatePosts, height }) => {
       `/comments-of-post?post_id=${post._id}`;
     try {
       const result = await axios.get(url, { withCredentials: true });
-      console.log(result.data);
       return result.data;
     } catch (error) {
       console.log(error);
@@ -118,29 +126,33 @@ const PostBox = ({ post, updatePosts, height }) => {
               {post.postedBy.userName}
             </Link>
           </h5>
+          <span className="menu-for-post-options">
+            {/* <MoreHorizIcon className="menu-for-post-options-icon" /> */}
+            <PositionedMenu url={url} />
+          </span>
         </div>
       ) : null}
       {/* card image */}
-      <HorizontalSlider items={post.photo} height={height} />
+      <div className="images-container">
+        <HorizontalSlider items={post.photo} height={height} />
+      </div>
       {/* card content */}
       <div className="card-content">
         {liked ? (
           <span
-            className="material-symbols-outlined material-symbols-outlined-red"
             onClick={() => {
               unlikePost(post._id);
             }}
           >
-            favorite
+            <FavoriteIcon />
           </span>
         ) : (
           <span
-            className="material-symbols-outlined"
             onClick={() => {
               likePost(post._id);
             }}
           >
-            favorite
+            <FavoriteBorderIcon />
           </span>
         )}
 
