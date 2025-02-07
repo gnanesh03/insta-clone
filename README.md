@@ -9,3 +9,13 @@
 # you need to configure mongodb and supabase project
 
 
+- [x] Fixed the google oauth issue in the backend
+- [x] Replies to comments 
+- [x] Added React queries 
+- [x] Context API added
+- [x] Trending Posts
+- [x] Search For Users
+- [x] Search for Posts
+- [x] Filter Popular Posts
+- [ ] Recommend Posts based on user behavious
+
