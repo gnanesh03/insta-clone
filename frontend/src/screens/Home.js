@@ -4,6 +4,7 @@ import PostBox from "../components/Post/PostBox";
 import spinner_svg from "../img/tube-spinner.svg";
 
 export default function Home() {
+  console.log("Home page rendered");
   const { posts, fetchPosts, hasMore, isLoading, setPosts } =
     useContext(HomePostsContext);
   const observer_ref = useRef();

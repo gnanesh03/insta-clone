@@ -76,7 +76,7 @@ const connectToMongoDB = async () => {
 
     mongoose.connection.on("connected", () => {
       console.log("Successfully connected to MongoDB.");
-      calculateAndUpdatePopularityScores();
+      // calculateAndUpdatePopularityScores();
     });
 
     mongoose.connection.on("error", () => {

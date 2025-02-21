@@ -29,7 +29,7 @@ const connectToMongoDB = async () => {
 
     mongoose.connection.on("connected", () => {
       console.log("Successfully connected to MongoDB.");
-      // generateDummyPosts(); // Generate posts after connection is established
+      generateDummyPosts(); // Generate posts after connection is established
     });
 
     mongoose.connection.on("error", () => {
@@ -75,7 +75,7 @@ async function generateDummyPosts() {
       throw new Error("The Excel file contains less than 30 entries.");
     }
 
-    const selectedData = data.slice(0, 30); // Take the first 30 rows
+    const selectedData = data.slice(30, 130); // Take the first 30 rows
     const posts = [];
 
     for (let i = 0; i < selectedData.length; i++) {
@@ -117,7 +117,7 @@ async function generateDummyPosts() {
 
     // Save posts to MongoDB
     await Post.insertMany(posts);
-    console.log("30 dummy posts created successfully!");
+    console.log("100 dummy posts created successfully!");
   } catch (error) {
     console.error("Error generating dummy posts:", error.message);
   }

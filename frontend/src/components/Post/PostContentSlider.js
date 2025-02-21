@@ -5,6 +5,10 @@ const HorizontalSlider = ({ items, height }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [transition_direction, setTransitionDirection] = useState("");
 
+  if (!items || items.length === 0) {
+    return null; // Fix: Ensures hooks are called before any return
+  }
+
   const handleNext = () => {
     setTransitionDirection("next");
     setTimeout(() => {

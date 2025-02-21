@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const port = process.env.port || 5000;
 const mongoose = require("mongoose");
-const { mongoUrl } = require("./keys");
 const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
@@ -21,7 +20,7 @@ app.use(require("./routes/auth"));
 app.use(require("./routes/createPost"));
 app.use(require("./routes/user"));
 app.use(require("./routes/Bundles.js"));
-app.use(require("./routes/test routes/SignedUrl.js"));
+app.use("/test", require("./routes/test routes/SignedUrl.js"));
 
 connectToMongoDB(mongoose);
 

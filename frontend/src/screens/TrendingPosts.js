@@ -1,15 +1,18 @@
-import React, { useContext, useRef, useEffect } from "react";
+import React, { useContext, useRef, useEffect, useState } from "react";
 import { TrendingPostsContext } from "../context/TrendingPostsContext";
 import PostBox from "../components/Post/PostBox";
 import spinner_svg from "../img/tube-spinner.svg";
 import styles from "./TrendingPosts.module.css";
 
 export default function TrendingPosts() {
+  console.log("Trending Posts rendered");
+
   const { posts, fetchPosts, hasMore, isLoading, setPosts } =
     useContext(TrendingPostsContext);
+
   const observer_ref = useRef();
 
-  // Observer to trigger fetching the next page
+  //Observer to trigger fetching the next page
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -29,7 +32,7 @@ export default function TrendingPosts() {
         observer.unobserve(observer_ref.current);
       }
     };
-  }, [hasMore, isLoading, fetchPosts]);
+  }, []);
 
   const updatePost = (post) => {
     if (posts.length > 0) {
@@ -43,6 +46,10 @@ export default function TrendingPosts() {
       setPosts(updated_posts);
     }
   };
+
+  //-----------------------------------TEST-----------------------------------------------
+
+  //-----------------------------------TEST-----------------------------------------------
 
   return (
     <div className={styles.root}>

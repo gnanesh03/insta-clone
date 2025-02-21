@@ -54,8 +54,8 @@ export default function Createpost() {
 
       if (response.status === 201) {
         notifyB("Post created successfully!");
-        setIsLoading(true);
-        navigate("/");
+        setIsLoading(false);
+        // navigate("/");
       } else {
         notifyA("Failed to create post. Try again.");
       }

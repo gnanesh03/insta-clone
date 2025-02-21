@@ -50,6 +50,12 @@ const comment_reply_schema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// const POST_IMAGE_FEATURE_VECTOR = new mongoose.Schema({
+//   feature_vector: [{ type: Number, required: true }],
+//   url: { type: String, required: true },
+//   post_id: { type: ObjectId, ref: "POST", required: true },
+// });
+
 postSchema.pre("remove", async function (next) {
   await mongoose.model("LIKE").deleteMany({ post_id: this._id });
   await mongoose.model("COMMENT").deleteMany({ post_id: this._id });

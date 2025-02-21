@@ -4,6 +4,8 @@ import axios from "axios";
 export const TrendingPostsContext = createContext();
 
 const TrendingPostsContextProvider = ({ children }) => {
+  console.log("Trending Posts Context Provider rendered");
+
   const [posts, setPosts] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -11,6 +13,7 @@ const TrendingPostsContextProvider = ({ children }) => {
   const limit = 3; // Number of posts to fetch per request
 
   const fetchPosts = async () => {
+    console.log("fetching trending posts  ");
     if (isLoading || !hasMore) return; // Avoid duplicate requests or over-fetching
 
     setIsLoading(true);
@@ -25,7 +28,7 @@ const TrendingPostsContextProvider = ({ children }) => {
       );
 
       const newPosts = result.data.posts;
-      console.log(newPosts);
+      console.log("fetching trending posts", newPosts);
       setPosts((prevPosts) => [
         ...prevPosts,
         ...newPosts.filter(

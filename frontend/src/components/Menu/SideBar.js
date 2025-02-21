@@ -7,6 +7,7 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import ImageSearchIcon from "@mui/icons-material/ImageSearch";
 import { Link } from "react-router-dom";
 
 const SideBar = ({}) => {
@@ -28,8 +29,13 @@ const SideBar = ({}) => {
       </div>
 
       <div className={styles.bottom_section}>
+        <Link className={styles.link} to="/similar-image-search">
+          <ImageSearchIcon />
+          <label>Similar Image Search</label>
+        </Link>
         <Link className={styles.link} to="/createPost">
-          <AddCircleOutlineOutlinedIcon /> <label>Create</label>
+          <AddCircleOutlineOutlinedIcon />
+          <label>Create</label>
         </Link>
         <Link className={styles.link} to="">
           <SettingsOutlinedIcon /> <label>Settings</label>

@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const FormData = require("form-data");
+const stream = require("stream");
 const requireLogin = require("../middlewares/requireLogin");
 const { route } = require("./auth");
 const multer = require("multer");
 const { validateFiles } = require("../utilities/files/FileValidation");
-
+const axios = require("axios");
 const ObjectId = mongoose.Types.ObjectId;
 
 const {
@@ -105,21 +107,25 @@ router.post(
         postedBy: req.user._id,
       });
 
-      await post.save().then((result) => {
-        //console.log("RESULT", result);
-        post_id = result._id;
-      });
+      //   await post.save().then((result) => {
+      //     //console.log("RESULT", result);
+      //     post_id = result._id;
+      //   });
 
       //now store the images in the database
-      const file_paths = await uploadFiles(files, req.user._id, post_id);
+      // const file_paths = await uploadFiles(files, req.user._id, post_id);
 
       //now you need to update the post table with the urls of the files
-      await POST.updateOne(
-        { _id: post_id },
-        {
-          $set: { photo: file_paths },
-        }
-      );
+      //   await POST.updateOne(
+      //     { _id: post_id },
+      //     {
+      //       $set: { photo: file_paths },
+      //     }
+      //   );
+
+      //dont forget the vectorize the image so you can find images similar to this image
+      // Step 4: Upload images to the vector database
+      await uploadImagesToVectorDB(files, post_id, ["some"]);
 
       //   // Step 4: Commit the transaction
       //   await session.commitTransaction();
@@ -299,5 +305,57 @@ router.get("/single-post/:id", requireLogin, async (req, res) => {
     res.status(500).json(error);
   }
 });
+
+const uploadImagesToVectorDB = async (files, post_id, file_paths) => {
+  try {
+    if (!files || files.length === 0) {
+      console.error("❌ No images to upload for vectorization.");
+      return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]; // Image file from multer
+      const image_url = file_paths[i]; // Supabase stored URL
+
+      try {
+        //const blob = new Blob([file.buffer], { type: file.mimetype });
+
+        // Create FormData object
+
+        const formData = new FormData();
+        formData.append("image", JSON.stringify(file.buffer), {
+          filename: file.originalname, // Ensure valid filename
+          contentType: file.mimetype,
+          knownLength: file.size, // Ensure correct length
+        });
+        formData.append("image", file);
+        formData.append("post_id", post_id);
+        formData.append("url", image_url);
+
+        // console.log(formData);
+        // Send request to FastAPI
+        const uploadResponse = await axios.post(
+          process.env.IMAGE_SEARCH_PYTHON_API + "/upload-image",
+          formData,
+          { headers: { ...formData.getHeaders() } }
+        );
+
+        console.log(
+          `✅ Image ${file.originalname} uploaded for post ${post_id}:`,
+          uploadResponse.data.message
+        );
+      } catch (err) {
+        console.error(
+          `❌ Error uploading image ${file.originalname}:`,
+          err.message
+        );
+      }
+    }
+
+    console.log(`✅ All images uploaded to vector DB for post: ${post_id}`);
+  } catch (error) {
+    console.error("❌ Error in uploadImagesToVectorDB:", error.message);
+  }
+};
 
 module.exports = router;

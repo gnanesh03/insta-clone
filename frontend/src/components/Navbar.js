@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { LoginContext } from "../context/LoginContext";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { Button } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function Navbar({ login }) {
   const { setModalOpen } = useContext(LoginContext);
@@ -32,9 +34,19 @@ export default function Navbar({ login }) {
             <li>Profile</li>
           </Link>
           <Link to={""}>
-            <button className="primaryBtn" onClick={() => setModalOpen(true)}>
-              Log Out
-            </button>
+            <Button
+              style={{ color: "black", padding: "0", fontSize: "15px" }}
+              onClick={() => setModalOpen(true)}
+            >
+              Logout{" "}
+              <LogoutIcon
+                style={{
+                  marginLeft: "5px",
+                  marginBottom: "2px",
+                  height: "21px",
+                }}
+              />{" "}
+            </Button>
           </Link>
         </>
       );

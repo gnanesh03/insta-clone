@@ -7,7 +7,7 @@ import PostModal from "../modals/PostModal";
 import PositionedMenu from "../Menu/MenuList";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-
+import SendIcon from "@mui/icons-material/Send";
 const PostBox = ({ post, updatePosts, height }) => {
   const [comment, setComment] = useState("");
   const user_id = JSON.parse(localStorage.getItem("user"))._id;
@@ -192,7 +192,7 @@ const PostBox = ({ post, updatePosts, height }) => {
             makeComment(comment, post._id);
           }}
         >
-          Post
+          <SendIcon />
         </button>
       </div>
     </div>

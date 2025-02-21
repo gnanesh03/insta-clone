@@ -20,6 +20,15 @@ router.get("posts/image", (req, res) => {
   // res.sendFile(my_path);
 });
 
+const storage = multer.memoryStorage(); // Store files in memory (for simplicity)
+const upload = multer({ storage: storage }); // Initialize multer with memory storage
+
+router.post("/send-image", upload.single("file"), (req, res) => {
+  console.log("esnding the ijage");
+  console.log(req.file);
+  res.send(req.file);
+});
+
 function createSignedURL(path) {
   const payload = {
     path: path,

@@ -1,0 +1,14 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 50px;
+}
+
+.item {
+  flex: 1 1 calc(33.33% - 10px);
+  max-width: calc(33.33% - 10px);
+  text-align: center;
+}

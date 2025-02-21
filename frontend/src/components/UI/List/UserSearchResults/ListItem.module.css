@@ -1,0 +1,31 @@
+.root {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  cursor: pointer;
+
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+
+  h4 {
+    margin: 0px;
+    padding: 0px;
+    color: #000000;
+    font-weight: 600;
+  }
+
+  h5 {
+    margin: 0px;
+    padding: 0px;
+    color: gray;
+    font-weight: 500;
+  }
+}
+
+.root:hover {
+  background-color: rgba(247, 249, 249, 255);
+}

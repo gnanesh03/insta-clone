@@ -25,6 +25,7 @@ import TrendingPostsContextProvider from "./context/TrendingPostsContext";
 import PostDetails from "./components/Post/IndividualPostPage/PostDetails";
 import TrendingPosts from "./screens/TrendingPosts";
 import Search from "./screens/Search";
+import SimilarImageSearch from "./screens/SimilarImageSearch";
 
 const queryClient = new QueryClient();
 
@@ -50,10 +51,9 @@ function App() {
                         path="/createPost"
                         element={<Createpost />}
                       ></Route>
-                      <Route
-                        path="/profile/:userid"
-                        element={<UserProfie />}
-                      ></Route>
+                      <Route path="/profile/:userid" element={<UserProfie />}>
+                        {" "}
+                      </Route>
                       <Route
                         path="/profile/:user_id/:post_id"
                         element={<PostDetails />}
@@ -70,6 +70,10 @@ function App() {
                       />
 
                       <Route path="/search" element={<Search />} />
+                      <Route
+                        path="/similar-image-search"
+                        element={<SimilarImageSearch />}
+                      />
                     </Route>
 
                     <Route path="/signup" element={<SignUp />}></Route>

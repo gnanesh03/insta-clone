@@ -86,17 +86,25 @@ async function uploadProfilePicToPublic(file, user_id) {
 async function createSignedUrls(paths) {
   let signed_urls = [];
 
-  const { data, error } = await supabase.storage
-    .from("instagram-clone")
-    .createSignedUrls(paths, 60 * 60); //valid for 60 minutes
+  try {
+    const { data, error } = await supabase.storage
+      .from("instagram-clone")
+      .createSignedUrls(paths, 60 * 60); //valid for 60 minutes
 
-  if (error) {
-    console.log(error);
-  } else {
-    //console.log(data);
-    for (const i of data) {
-      signed_urls.push(i.signedUrl);
+    if (error) {
+      console.log(
+        "MY_CUSTOM_MESSAGE",
+        "error while creating signedurls",
+        error
+      );
+    } else {
+      //console.log(data);
+      for (const i of data) {
+        signed_urls.push(i.signedUrl);
+      }
     }
+  } catch (err) {
+    console.log(err);
   }
   return signed_urls;
 }

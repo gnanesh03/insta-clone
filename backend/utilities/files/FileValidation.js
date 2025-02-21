@@ -2,6 +2,7 @@ const multer = require("multer");
 
 // Multer in-memory storage for validation
 const storage = multer.memoryStorage();
+const upload = multer({ storage: storage }); // Initialize multer with memory storage
 
 const validateFiles = multer({
   storage: storage,
@@ -31,4 +32,4 @@ const validateProfileImage = multer({
   },
 });
 
-module.exports = { validateFiles, validateProfileImage };
+module.exports = { validateFiles, validateProfileImage, upload };

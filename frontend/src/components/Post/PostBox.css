@@ -51,7 +51,7 @@
 
 .comment {
   border: none;
-  background-color: none;
+  background-color: white;
   font-weight: bolder;
   cursor: pointer;
 }
