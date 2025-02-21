@@ -12,7 +12,7 @@
   display: flex;
   justify-content: space-around;
   position: fixed;
-  box-shadow: 1px 5px 5px #e0dcdc;
+  box-shadow: 1px 1px 1px #e0dcdc;
   left: 0px;
   right: 3px;
   z-index: 100;

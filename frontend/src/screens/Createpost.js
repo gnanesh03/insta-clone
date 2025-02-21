@@ -34,13 +34,15 @@ export default function Createpost() {
 
     if (!isValid) return;
 
+    console.log(files);
+
     const formData = new FormData();
     formData.append("body", body);
 
     Array.from(files).forEach((file) => {
       formData.append("files", file);
     });
-
+    console.log(formData);
     try {
       setIsLoading(true);
       const url = process.env.REACT_APP_BACKEND_URL;
@@ -55,7 +57,7 @@ export default function Createpost() {
       if (response.status === 201) {
         notifyB("Post created successfully!");
         setIsLoading(false);
-        // navigate("/");
+        navigate("/");
       } else {
         notifyA("Failed to create post. Try again.");
       }

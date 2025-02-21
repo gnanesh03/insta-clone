@@ -43,14 +43,12 @@ const SimilarImageSearch = () => {
 
       <button onClick={handleSearch}>Search</button>
 
-      {images.length > 1 && (
-        <div>
-          <div style={{ marginLeft: "400px" }}>
-            <h1>Your query image</h1>
-            <img src={images[0].url} style={{ width: "200px" }} />
-          </div>
+      <div>
+        <div style={{ marginLeft: "400px" }}>
+          <h1>Your query image</h1>
+          <img src={URL.createObjectURL(image)} style={{ width: "200px" }} />
         </div>
-      )}
+      </div>
 
       {images.length > 0 && (
         <div>

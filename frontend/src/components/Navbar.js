@@ -1,127 +1,40 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import CompanyLogo from "./logo/CompanyLogo";
 import "../css/Navbar.css";
-import { Link } from "react-router-dom";
 import { LoginContext } from "../context/LoginContext";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { Button } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-export default function Navbar({ login }) {
+export default function Navbar() {
   const { setModalOpen } = useContext(LoginContext);
   const navigate = useNavigate();
 
-  // console.log("navbar rendered");
-
-  const loginStatus = () => {
-    const token = localStorage.getItem("jwt");
-    //const indexes = [1,2,3,4]
-
-    if (Cookies.get("is_logged_in") === "true") {
-      return (
-        <>
-          <Link to="/createPost">Create Post</Link>
-          <Link style={{ marginLeft: "20px" }} to="/followingpost">
-            My Following
-          </Link>
-
-          <Link to="/trending-posts" style={{ marginLeft: "20px" }}>
-            Trending
-          </Link>
-
-          <Link to="/profile">
-            <li>Profile</li>
-          </Link>
-          <Link to={""}>
-            <Button
-              style={{ color: "black", padding: "0", fontSize: "15px" }}
-              onClick={() => setModalOpen(true)}
-            >
-              Logout{" "}
-              <LogoutIcon
-                style={{
-                  marginLeft: "5px",
-                  marginBottom: "2px",
-                  height: "21px",
-                }}
-              />{" "}
-            </Button>
-          </Link>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <Link to="/signup">
-            <li>SignUp</li>
-          </Link>
-          <Link to="/signin">
-            <li>SignIn</li>
-          </Link>
-        </>
-      );
-    }
-  };
-  const loginStatusMobile = () => {
-    const token = localStorage.getItem("jwt");
-    if (Cookies.get("is_logged_in") === "true") {
-      return (
-        <>
-          <Link to="/">
-            <li>
-              <span className="material-symbols-outlined">home</span>
-            </li>
-          </Link>
-          <Link to="/profile">
-            <li>
-              <span className="material-symbols-outlined">account_circle</span>
-            </li>
-          </Link>
-          <Link to="/createPost">
-            <li>
-              <span className="material-symbols-outlined">add_box</span>
-            </li>
-          </Link>
-          <Link style={{ marginLeft: "20px" }} to="/followingpost">
-            <li>
-              <span className="material-symbols-outlined">explore</span>
-            </li>
-          </Link>
-          <Link to={""}>
-            <li onClick={() => setModalOpen(true)}>
-              <span className="material-symbols-outlined">logout</span>
-            </li>
-          </Link>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <Link to="/signup">
-            <li>SignUp</li>
-          </Link>
-          <Link to="/signin">
-            <li>SignIn</li>
-          </Link>
-        </>
-      );
-    }
-  };
-
   return (
-    <div className="navbar">
-      <span
-        className="company-logo"
-        onClick={() => {
-          navigate("/");
-        }}
-      >
+    <div
+      className="navbar"
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "10px 20px",
+      }}
+    >
+      {/* Company Logo on the Left */}
+      <span className="company-logo" onClick={() => navigate("/")}>
         <CompanyLogo />
       </span>
 
-      <ul className="nav-menu">{loginStatus()}</ul>
-      <ul className="nav-mobile">{loginStatusMobile()}</ul>
+      {/* Logout Button on the Right */}
+      <Button
+        style={{ color: "black", fontSize: "15px" }}
+        onClick={() => setModalOpen(true)}
+      >
+        Logout
+        <LogoutIcon
+          style={{ marginLeft: "5px", marginBottom: "2px", height: "21px" }}
+        />
+      </Button>
     </div>
   );
 }

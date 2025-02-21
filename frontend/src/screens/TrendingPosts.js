@@ -32,7 +32,7 @@ export default function TrendingPosts() {
         observer.unobserve(observer_ref.current);
       }
     };
-  }, []);
+  }, [hasMore]);
 
   const updatePost = (post) => {
     if (posts.length > 0) {

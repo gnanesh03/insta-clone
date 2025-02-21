@@ -107,27 +107,27 @@ router.post(
         postedBy: req.user._id,
       });
 
-      //   await post.save().then((result) => {
-      //     //console.log("RESULT", result);
-      //     post_id = result._id;
-      //   });
+      await post.save().then((result) => {
+        //console.log("RESULT", result);
+        post_id = result._id.toString();
+      });
 
-      //now store the images in the database
-      // const file_paths = await uploadFiles(files, req.user._id, post_id);
+      //now store the images in the supabase server
+      const file_paths = await uploadFiles(files, req.user._id, post_id);
 
-      //now you need to update the post table with the urls of the files
-      //   await POST.updateOne(
-      //     { _id: post_id },
-      //     {
-      //       $set: { photo: file_paths },
-      //     }
-      //   );
+      // now you need to update the post table with the urls of the files
+      await POST.updateOne(
+        { _id: post_id },
+        {
+          $set: { photo: file_paths },
+        }
+      );
 
       //dont forget the vectorize the image so you can find images similar to this image
       // Step 4: Upload images to the vector database
-      await uploadImagesToVectorDB(files, post_id, ["some"]);
+      await uploadImagesToVectorDB(files, post_id, file_paths, res);
 
-      //   // Step 4: Commit the transaction
+      //   // Step 4: Commit the transaction ,well no
       //   await session.commitTransaction();
       //   session.endSession();
 
@@ -318,21 +318,15 @@ const uploadImagesToVectorDB = async (files, post_id, file_paths) => {
       const image_url = file_paths[i]; // Supabase stored URL
 
       try {
-        //const blob = new Blob([file.buffer], { type: file.mimetype });
-
         // Create FormData object
 
         const formData = new FormData();
-        formData.append("image", JSON.stringify(file.buffer), {
-          filename: file.originalname, // Ensure valid filename
-          contentType: file.mimetype,
-          knownLength: file.size, // Ensure correct length
-        });
-        formData.append("image", file);
+
+        formData.append("image", file.buffer, "LARA CROFT");
+
         formData.append("post_id", post_id);
         formData.append("url", image_url);
 
-        // console.log(formData);
         // Send request to FastAPI
         const uploadResponse = await axios.post(
           process.env.IMAGE_SEARCH_PYTHON_API + "/upload-image",
@@ -345,14 +339,9 @@ const uploadImagesToVectorDB = async (files, post_id, file_paths) => {
           uploadResponse.data.message
         );
       } catch (err) {
-        console.error(
-          `❌ Error uploading image ${file.originalname}:`,
-          err.message
-        );
+        console.error(`❌ Error uploading image :`, err.message);
       }
     }
-
-    console.log(`✅ All images uploaded to vector DB for post: ${post_id}`);
   } catch (error) {
     console.error("❌ Error in uploadImagesToVectorDB:", error.message);
   }
