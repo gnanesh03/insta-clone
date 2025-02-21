@@ -17,6 +17,6 @@
 - [x] Search For Users
 - [x] Search for Posts
 - [x] Filter Popular Posts
-- [x] Upload a image and get images that are visually similar to it
+- [x] Upload a image and get images that are visually similar to it ⭐⭐⭐
 - [ ] Recommend Posts based on user behavious
 
